@@ -11,12 +11,19 @@ import java.nio.charset.StandardCharsets;
 public class Main {
     //private static final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
     //private static ObjectMapper objectMapper = new ObjectMapper();
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         CreateProduct message = new CreateProduct("test", 100.0);
         byte[] out = Client.encode(message);
         System.out.println(Client.bytesToHex(out));
         CreateProduct decoded = Server.decode(out);
         System.out.println(decoded);
+
+        String testMessage = "test";
+        byte[] encrypted = Message.encrypt(testMessage.getBytes(StandardCharsets.UTF_8));
+        System.out.println(Client.bytesToHex(encrypted));
+        byte[] decrypted = Message.decrypt(encrypted);
+        String result = new String(decrypted, StandardCharsets.UTF_8);
+        System.out.println(result);
     }
 
 

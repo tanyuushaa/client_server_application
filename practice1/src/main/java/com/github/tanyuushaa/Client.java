@@ -12,7 +12,8 @@ public class Client {
 
     @SneakyThrows
     public static byte[] encode(CreateProduct message) {
-        byte[] messageBytes = mapper.writeValueAsBytes(message);
+        byte[] plainBytes = mapper.writeValueAsBytes(message);
+        byte[] messageBytes = Message.encrypt(plainBytes);
         int messageSize = messageBytes.length + 4 + 4;
         int size = 1 + 1 + 8 + 4 + 2 + 2 + messageSize;
         ByteBuffer buffer = ByteBuffer.allocate(size).order(ByteOrder.BIG_ENDIAN);

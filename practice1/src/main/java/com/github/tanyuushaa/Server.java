@@ -33,6 +33,7 @@ public class Server {
         short expectedCrc2 = Crc16.calculateCrc(buffer.array(), 16, wlen);
         if (w2Crc16 != expectedCrc2)
             throw new IllegalArgumentException();
-        return mapper.readValue(messageBytes, CreateProduct.class);
+        byte[] plain = Message.decrypt(messageBytes);
+        return mapper.readValue(plain, CreateProduct.class);
     }
 }
