@@ -5,19 +5,36 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class MainTest {
-
-    /*@Test
-    void givenMessage_shouldEncodeToHexString() {
+    @Test
+    void testEncodeClient_shouldEncodeToHexString() {
         CreateProduct message = new CreateProduct("test", 100.0);
-        String expected = "130100000000000000020000002549A800000003000000047B226E616D65223A2274657374222C227072696365223A3130302E307DF40E";
-        byte[] out = Main.encode(message);
-        assertEquals(expected, Main.bytesToHex(out));
+        byte[] encoded = Client.encode(message);
+        String hex = Client.bytesToHex(encoded);
+        assertNotNull(hex);
+        assertTrue(hex.matches("[0-9A-F]+"));
     }
 
     @Test
-    void givenByteArray_shouldDecodeMessage() {
-        CreateProduct expected = new CreateProduct("test", 100.0);
-        byte[] in = new byte[] {19, 1, 0, };
-        assertEquals(expected, Main.decode(in));
-    }*/
+    void testDecodeService_shouldDecodeToOriginal() {
+        CreateProduct original = new CreateProduct("test", 100.0);
+        byte[] packet = Client.encode(original);
+        CreateProduct decoded = Server.decode(packet);
+        assertEquals(original, decoded);
+    }
+
+    @Test
+    void whenMessageCorrupted_decodeThrowsException() {
+        CreateProduct message = new CreateProduct("test", 100.0);
+        byte[] packet = Client.encode(message);
+        packet[0] ^= 0xFF;
+        assertThrows(IllegalArgumentException.class, () -> Server.decode(packet));
+    }
+
+    @Test
+    void testMessageEncryptAndDecrypt() throws Exception {
+        String original = "test";
+        byte[] encrypted = Message.encrypt(original.getBytes());
+        byte[] decrypted = Message.decrypt(encrypted);
+        assertEquals(original, new String(decrypted));
+    }
 }
