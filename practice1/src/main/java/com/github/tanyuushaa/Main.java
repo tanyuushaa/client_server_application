@@ -1,17 +1,76 @@
 package com.github.tanyuushaa;
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
-public class Main {
-    public static void main(String[] args) {
-        //TIP Press <shortcut actionId="ShowIntentionActions"/> with your caret at the highlighted text
-        // to see how IntelliJ IDEA suggests fixing it.
-        System.out.printf("Hello and welcome!");
 
-        for (int i = 1; i <= 5; i++) {
-            //TIP Press <shortcut actionId="Debug"/> to start debugging your code. We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
-            // for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.
-            System.out.println("i = " + i);
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
+
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
+
+public class Main {
+    private static final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
+    private static ObjectMapper objectMapper = new ObjectMapper();
+    public static void main(String[] args) {
+        CreateProduct message = new CreateProduct("test", 100.0);
+        byte[] out = encode(message);
+        System.out.println(bytesToHex(out));
+        CreateProduct decoded = decode(out);
+        System.out.println(decoded);
+    }
+
+
+    @SneakyThrows
+    public static byte[] encode(CreateProduct message) {
+        byte[] messageBytes = objectMapper.writeValueAsBytes(message);
+        int messageSize = messageBytes.length + 4 + 4;
+        int size = 1 + 1 + 8 + 4 + 2 + 2 + messageSize;
+        ByteBuffer buffer = ByteBuffer.allocate(size).order(ByteOrder.BIG_ENDIAN);
+        buffer.put((byte)0x13)
+                .put((byte)1)
+                .putLong(2)
+                .putInt(messageSize)
+                .putShort(Crc16.calculateCrc(buffer.array(), 0, 14))
+                .putInt(3)
+                .putInt(4)
+                .put(messageBytes)
+                .putShort(Crc16.calculateCrc(buffer.array(), 16, messageSize));
+        return buffer.array();
+    }
+
+    public static String bytesToHex(byte[] bytes) {
+        char[] hexChars = new char[bytes.length * 2];
+        for ( int j = 0; j < bytes.length; j++ ) {
+            int v = bytes[j] & 0xFF;
+            hexChars[j * 2] = HEX_ARRAY[v >>> 4];
+            hexChars[j * 2 + 1] = HEX_ARRAY[v & 0x0F];
         }
+        return new String(hexChars);
+    }
+
+    @SneakyThrows
+    public static CreateProduct decode(byte[] bytes) {
+        ByteBuffer buffer = ByteBuffer.wrap(bytes).order(ByteOrder.BIG_ENDIAN);
+        byte bMagic = buffer.get();
+        if (bMagic != 0x13) {
+            throw new IllegalArgumentException();
+        }
+        byte bSrc = buffer.get();
+        long bPktId = buffer.getLong();
+        int wlen = buffer.getInt();
+        short wCrc16 = buffer.getShort();
+        short expectedCrc = Crc16.calculateCrc(buffer.array(), 0, 14);
+        if (wCrc16 != expectedCrc)
+            throw new IllegalArgumentException();
+        int cType = buffer.getInt();
+        int bUserId = buffer.getInt();
+        int messageSize = wlen - 8;
+        byte[] messageBytes = new byte[messageSize];
+        buffer.get(messageBytes, 0, messageSize);
+        short w2Crc16 = buffer.getShort(bytes.length - 2);
+        short expectedCrc2 = Crc16.calculateCrc(buffer.array(), 16, wlen);
+        if (w2Crc16 != expectedCrc2)
+            throw new IllegalArgumentException();
+        return objectMapper.readValue(messageBytes, CreateProduct.class);
     }
 }
