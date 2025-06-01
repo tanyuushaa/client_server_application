@@ -9,18 +9,18 @@ import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 
 public class Main {
-    private static final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
-    private static ObjectMapper objectMapper = new ObjectMapper();
+    //private static final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
+    //private static ObjectMapper objectMapper = new ObjectMapper();
     public static void main(String[] args) {
         CreateProduct message = new CreateProduct("test", 100.0);
-        byte[] out = encode(message);
-        System.out.println(bytesToHex(out));
-        CreateProduct decoded = decode(out);
+        byte[] out = Client.encode(message);
+        System.out.println(Client.bytesToHex(out));
+        CreateProduct decoded = Server.decode(out);
         System.out.println(decoded);
     }
 
 
-    @SneakyThrows
+    /*@SneakyThrows
     public static byte[] encode(CreateProduct message) {
         byte[] messageBytes = objectMapper.writeValueAsBytes(message);
         int messageSize = messageBytes.length + 4 + 4;
@@ -72,5 +72,5 @@ public class Main {
         if (w2Crc16 != expectedCrc2)
             throw new IllegalArgumentException();
         return objectMapper.readValue(messageBytes, CreateProduct.class);
-    }
+    }*/
 }
