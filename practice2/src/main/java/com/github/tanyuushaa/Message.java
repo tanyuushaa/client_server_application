@@ -44,7 +44,7 @@ public class Message {
 
     @Override
     public String toString() {
-        return "Message [type=" + type + ", userId=" + userId + ", message=" + message + "]";
+        return "Message [type=" + type + ", userId=" + userId + ", message=" + (message != null ? message : "[encrypted]") + "]";
     }
 }
 

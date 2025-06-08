@@ -13,6 +13,7 @@ public class FakeReceiver implements Receiver {
         this.queue = queue;
     }
 
+    // число у масив, формат BIG_ENDIAN
     private byte[] intToBytes(int i) {
         return new byte[] {
                 (byte) (i >>> 24),
@@ -38,6 +39,7 @@ public class FakeReceiver implements Receiver {
 
         message.encrypt();
 
+        // байтове представлення + формування пакету
         byte[] typeBytes = intToBytes(message.getType());
         byte[] userIdBytes = intToBytes(message.getUserId());
         byte[] playload = message.getEncryptedMessage();
