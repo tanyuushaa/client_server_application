@@ -3,7 +3,7 @@ package com.github.tanyuushaa;
 public class Message {
     private final int type; // команда
     private final int userId; // ідентифікатор користувача
-    private final String message; //запит
+    private String message; //запит
     private byte[] encryptedMessage; // шифрування
 
     public Message(MessageBuilder builder) {
@@ -30,6 +30,16 @@ public class Message {
 
     public void setEncryptedMessage(byte[] encryptedMessage) {
         this.encryptedMessage = encryptedMessage;
+    }
+
+    public void encrypt() {
+        this.encryptedMessage = CryptoUtils.encrypt(this.message);
+        this.message = null;
+    }
+
+    public void decrypt() {
+        if (this.encryptedMessage != null)
+            this.message = CryptoUtils.decrypt(this.encryptedMessage);
     }
 
     @Override
