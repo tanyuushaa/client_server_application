@@ -1,15 +1,26 @@
 package com.github.tanyuushaa;
 
+import java.net.InetAddress;
+
 public class Message {
     private final int type; // команда
     private final int userId; // ідентифікатор користувача
     private String message; //запит
     private byte[] encryptedMessage; // шифрування
+    private InetAddress address;
 
     public Message(MessageBuilder builder) {
         this.type = builder.type;
         this.userId = builder.userId;
         this.message = builder.message;
+    }
+
+    public InetAddress getAddress() {
+        return address;
+    }
+
+    public void setAddress(InetAddress address) {
+        this.address = address;
     }
 
     public int getType() {

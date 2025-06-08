@@ -21,7 +21,7 @@ public class MessageDecryptor implements Decryptor {
                 .build();
 
         message.setEncryptedMessage(encrypted);
-        System.out.println(message);
+        //System.out.println(message);
         return message;
     }
 
