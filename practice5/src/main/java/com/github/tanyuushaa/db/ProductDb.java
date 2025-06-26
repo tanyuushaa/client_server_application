@@ -6,6 +6,8 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.github.tanyuushaa.db.DbUtils.connect;
+
 public class ProductDb {
     public ProductDb() {
         try {
@@ -26,7 +28,7 @@ public class ProductDb {
                 );
                 """;
 
-        try (Connection connection = DbUtils.connect();
+        try (Connection connection = connect();
              Statement statement = connection.createStatement()) {
             statement.execute(sql);
             System.out.println("Table created");
@@ -35,7 +37,7 @@ public class ProductDb {
 
     public void create(Product product) {
         String sql = "INSERT INTO product(name, category, quantity, price) VALUES (?, ?, ?, ?)";
-        try ( Connection connection = DbUtils.connect();
+        try ( Connection connection = connect();
               PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, product.getName());
             statement.setString(2, product.getCategory());
@@ -49,7 +51,7 @@ public class ProductDb {
 
     public Product getById(int id) {
         String sql = "SELECT * FROM product WHERE id = ?";
-        try (Connection connection = DbUtils.connect();
+        try (Connection connection = connect();
         PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setInt(1, id);
             ResultSet resultSet = statement.executeQuery();
@@ -69,23 +71,24 @@ public class ProductDb {
     }
 
     public void update(Product product) {
-        String sql = "UPDATE product SET name = ?, category = ?, quantity = ?, price = ? WHERE id = ?";
-        try (Connection connection = DbUtils.connect();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setString(1, product.getName());
-            statement.setString(2, product.getCategory());
-            statement.setInt(3, product.getQuantity());
-            statement.setDouble(4, product.getPrice());
-            statement.setInt(5, product.getId());
-            statement.executeUpdate();
+        try (Connection conn = connect();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "UPDATE product SET name = ?, category = ?, quantity = ?, price = ? WHERE id = ?")) {
+            stmt.setString(1, product.getName());
+            stmt.setString(2, product.getCategory());
+            stmt.setInt(3, product.getQuantity());
+            stmt.setDouble(4, product.getPrice());
+            stmt.setInt(5, product.getId());
+            stmt.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new RuntimeException(e);
         }
     }
 
+
     public void delete(int id) {
         String sql = "DELETE FROM product WHERE id = ?";
-        try (Connection connection = DbUtils.connect();
+        try (Connection connection = connect();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setInt(1, id);
             statement.execute();
@@ -128,7 +131,7 @@ public class ProductDb {
             sql.append(" AND price <= ? ");
             params.add(maxPrice);
         }
-        try (Connection connection = DbUtils.connect();
+        try (Connection connection = connect();
              PreparedStatement statement = connection.prepareStatement(sql.toString())) {
             for (int i = 0; i < params.size(); i++) {
                 statement.setObject(i + 1, params.get(i));
@@ -152,10 +155,35 @@ public class ProductDb {
 
     }
     public void deleteAll() {
-        try (Connection connection = DbUtils.connect(); Statement statement = connection.createStatement()) {
+        try (Connection connection = connect(); Statement statement = connection.createStatement()) {
             statement.execute("DELETE FROM product");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
+
+    public Product findByName(String name) {
+        try (Connection conn = connect();
+             PreparedStatement stmt = conn.prepareStatement("SELECT * FROM product WHERE name = ?")) {
+
+            stmt.setString(1, name);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                return new Product(
+                        rs.getInt("id"),
+                        rs.getString("name"),
+                        rs.getString("category"),
+                        rs.getInt("quantity"),
+                        rs.getDouble("price")
+                );
+            } else {
+                return null;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
 }

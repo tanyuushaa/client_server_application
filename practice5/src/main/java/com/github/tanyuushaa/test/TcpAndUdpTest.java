@@ -1,4 +1,4 @@
-package com.github.tanyuushaa;
+package com.github.tanyuushaa.test;
 
 import com.github.tanyuushaa.core.CryptoUtils;
 import com.github.tanyuushaa.core.Message;

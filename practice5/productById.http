@@ -1,0 +1,3 @@
+GET http://localhost:8080/api/good/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyIiwiaWF0IjoxNzUwOTYzODk3LCJleHAiOjE3NTA5Njc0OTd9.D_bqDph57rzrvs94xDvsjLGLu-KCu6nii5f1ufavd-Y
+

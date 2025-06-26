@@ -1,0 +1,10 @@
+PUT http://localhost:8080/api/good
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyIiwiaWF0IjoxNzUwOTYzMzY1LCJleHAiOjE3NTA5NjY5NjV9.iV3bgaUx-Jr0Y6SRsUIhZ0voNJcaD55awfjLYkVjLRw
+Content-Type: application/json
+
+{
+  "name": "kiwi",
+  "category": "fruit",
+  "quantity": 150,
+  "price": 12.5
+}

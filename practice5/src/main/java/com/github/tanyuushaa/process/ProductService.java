@@ -8,30 +8,25 @@ import java.util.List;
 import java.util.Optional;
 
 public class ProductService {
-    private final ProductDb productDb;
+    private final ProductDb productDb = new ProductDb();
 
-    public ProductService() {
-        this.productDb = new ProductDb();
-    }
+
+
 
     public void addProduct(Product product) {
-        if (product.getName() == null || product.getName().isBlank()) {
-            throw new IllegalArgumentException("Product name cannot be empty");
-        }
-
-        List<Product> existing = productDb.getAll(product.getName(), null, null, null, null, null);
-        if (!existing.isEmpty()) {
+        if (productDb.findByName(product.getName()) != null) {
             throw new IllegalArgumentException("Product already exists");
         }
         productDb.create(product);
     }
+
 
     public Product getProductById (int id) {
         return Optional.ofNullable(productDb.getById(id)).orElseThrow(() -> new IllegalArgumentException("Product not found"));
     }
 
     public void updateProduct(Product product) {
-        Product existing = getProductById(product.getId());
+        //Product existing = getProductById(product.getId());
         productDb.update(product);
     }
 

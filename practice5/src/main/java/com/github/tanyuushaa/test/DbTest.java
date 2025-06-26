@@ -1,10 +1,8 @@
+package com.github.tanyuushaa.test;
+
 import com.github.tanyuushaa.core.Product;
-import com.github.tanyuushaa.db.DbUtils;
-import com.github.tanyuushaa.db.ProductDb;
 import com.github.tanyuushaa.process.ProductService;
 
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.List;
 
 public class DbTest {
